@@ -17,7 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
 
   // Construct a prompt string based on the original text and paraphrase mode
-  const prompt = `Paraphrase "${originalText}" using ${paraphraseMode} mode. Do not add any additional word.`;
+  const prompt = `Rephrase "${originalText}" using ${paraphraseMode} mode. Do not add any additional word.`;
 
   // Define an async function to handle the paraphrasing operation
   const handleParaphrase = async (e: React.FormEvent) => {
@@ -43,6 +43,7 @@ export default function Home() {
 
     // Parse the response as JSON
     const data = await response.json();
+    console.log(data)
 
     // Set the paraphrased text to the first choice's message content in the response
     setParaphrasedText(data.choices[0].message.content);
