@@ -147,7 +147,7 @@ export default function AxenAIRephraser() {
               </button>
             </h2>
             <p
-              className="p-4 sm:text-lg border-gray-300 rounded-md bg-gray-100 mt-2 sm:mt-0 w-full"
+              className="p-4 sm:text-lg border-gray-300 rounded-md bg-gray-100 mt-2 sm:mt-0 w-full text-gray-700"
               style={{ whiteSpace: "pre-wrap" }}
             >
               {paraphrasedText}
