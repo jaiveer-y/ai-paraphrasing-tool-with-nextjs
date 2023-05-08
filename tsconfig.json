@@ -34,7 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "backend/paraphrase.ts"  ],
   "exclude": [
     "node_modules"
   ]

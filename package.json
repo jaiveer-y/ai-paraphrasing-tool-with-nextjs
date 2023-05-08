@@ -12,15 +12,19 @@
     "@types/node": "18.15.10",
     "@types/react": "18.0.29",
     "@types/react-dom": "18.0.11",
+    "@web3modal/ethereum": "^2.3.7",
+    "@web3modal/react": "^2.3.7",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
+    "ethers": "^5.7.2",
     "next": "13.2.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-draft-wysiwyg": "^1.15.0",
     "react-hot-toast": "^2.4.0",
     "react-spinners": "^0.13.8",
-    "typescript": "5.0.2"
+    "typescript": "5.0.2",
+    "wagmi": "^0.12.13"
   },
   "devDependencies": {
     "@types/draft-js": "^0.11.10",
