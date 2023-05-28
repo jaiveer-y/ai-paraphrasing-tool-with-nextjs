@@ -12,7 +12,6 @@ import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { arbitrum, bsc, mainnet, polygon } from "wagmi/chains";
 import { useAccount, useContract, useSigner } from "wagmi";
 
-
 const chains = [bsc];
 const projectId = "b45cd42eda39ee4449d97896b80bb6bb";
 
@@ -28,14 +27,12 @@ const ethereumClient = new EthereumClient(wagmiClient, chains);
 export default function AxenAIRephraser() {
   // Define three state variables for the original text, paraphrased text, and paraphrase mode
 
-
-  const {isConnected } = useAccount();
-console.log(isConnected)
-
+  const { isConnected } = useAccount();
 
   const [originalText, setOriginalText] = useState<string>("");
   const [paraphrasedText, setParaphrasedText] = useState<string>("");
   const [paraphraseMode, setParaphraseMode] = useState<string>("Standard");
+  const [language, setLanguage] = useState<string>("English");
 
   // Define a ref for the text area element
   const textAreaRef = useRef(null);
@@ -44,7 +41,7 @@ console.log(isConnected)
   const [loading, setLoading] = useState<boolean>(false);
 
   // Construct a prompt string based on the original text and paraphrase mode
-  const prompt = `Rephrase "${originalText}" using ${paraphraseMode} mode. Do not add any additional words.`;
+  const prompt = `Rephrase "${originalText}" using ${paraphraseMode} mode. Do not add any additional words. In ${language} Language.`;
 
   // Define an async function to handle the paraphrasing operation
   const handleParaphrase = async (e: React.FormEvent) => {
@@ -149,6 +146,53 @@ console.log(isConnected)
                   disabled
                 ></textarea>
               )}
+            </div>
+            <div className="mb-4">
+              <label
+                className="block font-medium mb-2"
+                htmlFor="paraphraseMode"
+              >
+                Select a Language:
+              </label>
+              <select
+                onChange={(e) => setLanguage(e.target.value)}
+                value={language}
+                id="paraphraseMode"
+                className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-lg border-gray-300 rounded-md"
+              >
+                <option value="English">English</option>
+                <option value="Arabic">Arabic</option>
+                <option value="Chinese">Chinese</option>
+                <option value="Dutch">Dutch</option>
+
+                <option value="French">French</option>
+                <option value="German">German</option>
+                <option value="Hindi">Hindi</option>
+                <option value="Italian">Italian</option>
+                <option value="Japanese">Japanese</option>
+                <option value="Korean">Korean</option>
+                <option value="Persian">Persian</option>
+                <option value="Portuguese">Portuguese</option>
+                <option value="Russian">Russian</option>
+                <option value="Spanish">Spanish</option>
+                <option value="Swedish">Swedish</option>
+                <option value="Turkish">Turkish</option>
+                <option value="Bengali">Bengali</option>
+                <option value="Czech">Czech</option>
+                <option value="Danish">Danish</option>
+                <option value="Finnish">Finnish</option>
+                <option value="Greek">Greek</option>
+                <option value="Hebrew">Hebrew</option>
+                <option value="Hungarian">Hungarian</option>
+                <option value="Indonesian">Indonesian</option>
+                <option value="Norwegian">Norwegian</option>
+                <option value="Polish">Polish</option>
+                <option value="Romanian">Romanian</option>
+                <option value="Swahili">Swahili</option>
+                <option value="Thai">Thai</option>
+                <option value="Ukrainian">Ukrainian</option>
+                <option value="Vietnamese">Vietnamese</option>
+              </select>
             </div>
             <div className="mb-4">
               <label
