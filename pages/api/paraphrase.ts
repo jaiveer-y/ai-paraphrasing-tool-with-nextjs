@@ -6,13 +6,12 @@ if (!process.env.NEXT_PUBLIC_ENV_VARIABLE_OPEN_AI_API_KEY) {
   throw new Error("Missing env var from OpenAI");
 }
 
-
 // Define ChatGPTAgent type as a union of user and system
 export type ChatGPTAgent = "user" | "system";
 
 // Define ChatGPTMessage interface
 interface ChatGPTMessage {
-  role: ChatGPTAgent; 
+  role: ChatGPTAgent;
   content: string;
 }
 
@@ -47,9 +46,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${
-          process.env.NEXT_PUBLIC_ENV_VARIABLE_OPEN_AI_API_KEY ?? ""
-        }`,
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_ENV_VARIABLE_OPEN_AI_API_KEY}`,
       },
       method: "POST",
       body: JSON.stringify(payload),
