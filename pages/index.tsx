@@ -210,13 +210,13 @@ export default function AxenAIRephraser() {
                 <option value="Standard">Standard</option>
                 <option value="Formal">Formal</option>
                 <option value="Creative">Creative</option>
-                <option value="Fun">Fun</option>
                 <option value="Fluent">Fluent</option>
                 <option value="Horror">Horror</option>
                 <option value="Technical">Techincal</option>
                 <option value="Emoji">Emoji</option>
                 <option value="Anime">Anime</option>
                 <option value="Comedy">Comedy</option>
+                <option value="Romantic">Romantic</option>
               </select>
             </div>
             <div className="flex justify-center">
