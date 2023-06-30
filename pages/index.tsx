@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Toaster, toast } from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
 import {
@@ -11,9 +11,17 @@ import { Web3Button, Web3Modal } from "@web3modal/react";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import { arbitrum, bsc, mainnet, polygon } from "wagmi/chains";
 import { useAccount, useContract, useSigner } from "wagmi";
-
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  setPersistence,
+  browserSessionPersistence,
+} from "firebase/auth";
+import { auth } from "./firebase";
 const chains = [bsc];
 const projectId = "b45cd42eda39ee4449d97896b80bb6bb";
+import "firebase/auth";
 
 const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiClient = createClient({
@@ -26,8 +34,9 @@ const ethereumClient = new EthereumClient(wagmiClient, chains);
 // Define a default function component called Axen AI Rephraser
 export default function AxenAIRephraser() {
   // Define three state variables for the original text, paraphrased text, and paraphrase mode
+  const [isAuth, setIsAuth] = useState(false);
+  const [isWalletAuth, setIsWalletAuth] = useState(false);
 
-  const { isConnected } = useAccount();
 
   const [originalText, setOriginalText] = useState<string>("");
   const [paraphrasedText, setParaphrasedText] = useState<string>("");
@@ -42,6 +51,69 @@ export default function AxenAIRephraser() {
 
   // Construct a prompt string based on the original text and paraphrase mode
   const prompt = `Rephrase "${originalText}" using ${paraphraseMode} mode. Do not add any additional words. In ${language} Language.`;
+  const { address, isConnected } = useAccount();
+
+  useEffect(() => {
+    const handleConnectionChange = (newIsConnected: boolean) => {
+      setIsAuth(newIsConnected);
+      setIsWalletAuth(newIsConnected);
+      console.log(newIsConnected);
+    };
+
+    handleConnectionChange(isConnected);
+  }, [isConnected]);
+
+
+  let UID = auth.currentUser?.uid;
+  let name = auth.currentUser?.displayName;
+  let photo = auth.currentUser?.photoURL;
+  
+
+
+
+
+  const signInWithGoogle = () => {
+    const provider = new GoogleAuthProvider();
+  
+    return setPersistence(auth, browserSessionPersistence)
+      .then(() => {
+        // Existing and future Auth states are now persisted in the current session only.
+        // Closing the window would clear any existing state even if a user forgets to sign out.
+        // New sign-in will be persisted with session persistence.
+        return signInWithPopup(auth, provider);
+      })
+      .then((userCredential) => {
+        // User signed in successfully
+        const user = userCredential.user;
+        
+        setIsAuth(true);
+        return user;
+      })
+      .catch((error) => {
+        // Handle Errors here
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error('Sign-in error:', errorCode, errorMessage);
+        throw error;
+      });
+  };
+
+  
+
+  const signOutButton = () => {
+    auth
+      .signOut()
+      .then(() => {
+        // Sign-out successful
+        console.log("User signed out");
+        setIsAuth(false);
+        // Add any additional logic or state updates here
+      })
+      .catch((error) => {
+        // An error occurred during sign-out
+        console.log(error);
+      });
+  };
 
   // Define an async function to handle the paraphrasing operation
   const handleParaphrase = async (e: React.FormEvent) => {
@@ -88,22 +160,82 @@ export default function AxenAIRephraser() {
                   className="h-8 mr-3"
                   alt="Flowbite Logo"
                 />
-                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
+                <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white hidden md:block">
                   Rephraser
                 </span>
               </a>
-              <div className="md:hidden block">
-                <Web3Button />
-              </div>
+
               <div
-                className="hidden w-full md:block md:w-auto"
+                className=" w-auto md:block md:w-auto"
                 id="navbar-default"
               >
-                <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                  <li>
-                    <Web3Button />
-                  </li>
-                </ul>
+                {isConnected && <Web3Button />}
+
+                {UID && !isConnected && (
+                  <div className="">
+                  <button
+                  type="button"
+                  className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mx-2"
+                  
+                >
+                 <img src={photo} alt={UID} className="w-5 h-5 mr-2 border rounded-full"/>
+                  {name}
+                </button>
+                  <button
+                    type="button"
+                    className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mx-2"
+                    onClick={signOutButton}
+                  >
+                    <svg
+                      className="w-5 h-5 mr-1"
+                      aria-hidden="true"
+                      focusable="false"
+                      data-prefix="fab"
+                      data-icon="google"
+                      role="img"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 488 512"
+                    >
+                      <path
+                        fill="currentColor"
+                        d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                      ></path>
+                    </svg>
+                    Sign Out
+                  </button>
+                  </div>
+                )}
+
+                {!UID && !isConnected && (
+                  <ul className="flex flex-row items-center justify-center">
+                    <li className="mx-1">
+                      <Web3Button />
+                    </li>
+                    <li className="mx-1">
+                      <button
+                        type="button"
+                        className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 "
+                        onClick={signInWithGoogle}
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          aria-hidden="true"
+                          focusable="false"
+                          data-prefix="fab"
+                          data-icon="google"
+                          role="img"
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 488 512"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                          ></path>
+                        </svg>
+                      </button>
+                    </li>
+                  </ul>
+                )}
               </div>
             </div>
           </nav>
@@ -126,7 +258,7 @@ export default function AxenAIRephraser() {
               Paraphrase button to see the results!
             </p>
             <div className="mb-4">
-              {isConnected ? (
+              {UID || isConnected ? (
                 <textarea
                   onChange={(e) => setOriginalText(e.target.value)}
                   value={originalText}
@@ -141,7 +273,7 @@ export default function AxenAIRephraser() {
                   value={originalText}
                   rows={6}
                   className="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full h-96 p-4 sm:text-lg border-gray-300 rounded-mdplaceholder-gray-400 placeholder-opacity-75 border rounded-lg"
-                  placeholder="Connect wallet to use the rephraser"
+                  placeholder="Login with Google OR connect wallet to use the Rephraser"
                   ref={textAreaRef}
                   disabled
                 ></textarea>
@@ -220,7 +352,7 @@ export default function AxenAIRephraser() {
               </select>
             </div>
             <div className="flex justify-center">
-              {isConnected ? (
+              {UID || isConnected ? (
                 <button
                   onClick={handleParaphrase}
                   className="inline-block px-4 py-2 leading-none border rounded-lg text-black bg-gray-100 hover:bg-gray-700 focus:bg-black focus:text-white hover:text-white"
@@ -228,7 +360,34 @@ export default function AxenAIRephraser() {
                   Paraphrase
                 </button>
               ) : (
-                <Web3Button />
+                <ul className="flex flex-row items-center justify-center">
+                  <li className="mx-1">
+                    <Web3Button />
+                  </li>
+                  <li className="mx-1">
+                    <button
+                      type="button"
+                      class="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 "
+                      onClick={signInWithGoogle}
+                    >
+                      <svg
+                        class="w-5 h-5"
+                        aria-hidden="true"
+                        focusable="false"
+                        data-prefix="fab"
+                        data-icon="google"
+                        role="img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 488 512"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                        ></path>
+                      </svg>
+                    </button>
+                  </li>
+                </ul>
               )}
             </div>
             <Toaster
