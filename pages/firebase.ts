@@ -23,3 +23,9 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
 export default app;
+
+export  function Home1() {
+  return {
+    
+  };
+}
