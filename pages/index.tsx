@@ -18,7 +18,7 @@ import {
   setPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import { auth } from "./firebase";
+import { auth } from "../firebase";
 const chains = [bsc];
 const projectId = "b45cd42eda39ee4449d97896b80bb6bb";
 import "firebase/auth";
