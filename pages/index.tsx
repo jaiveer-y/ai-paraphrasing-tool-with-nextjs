@@ -66,7 +66,7 @@ export default function AxenAIRephraser() {
 
   let UID = auth.currentUser?.uid;
   let name = auth.currentUser?.displayName;
-  let photo = auth.currentUser?.photoURL;
+  let photo = auth.currentUser?.photoURL || "https://images.unsplash.com/photo-1630568321790-65edcc51b544?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
   
 
 
@@ -367,11 +367,11 @@ export default function AxenAIRephraser() {
                   <li className="mx-1">
                     <button
                       type="button"
-                      class="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 "
+                      className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 "
                       onClick={signInWithGoogle}
                     >
                       <svg
-                        class="w-5 h-5"
+                        className="w-5 h-5"
                         aria-hidden="true"
                         focusable="false"
                         data-prefix="fab"
