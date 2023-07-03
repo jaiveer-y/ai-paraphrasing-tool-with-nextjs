@@ -22,6 +22,11 @@ import { auth } from "../firebase";
 const chains = [bsc];
 const projectId = "b45cd42eda39ee4449d97896b80bb6bb";
 import "firebase/auth";
+import { providers } from "ethers";
+import axios from "axios";
+const SID = require("@siddomains/sidjs").default;
+const SIDfunctions = require("@siddomains/sidjs");
+const Web3 = require("web3");
 
 const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiClient = createClient({
@@ -36,7 +41,6 @@ export default function AxenAIRephraser() {
   // Define three state variables for the original text, paraphrased text, and paraphrase mode
   const [isAuth, setIsAuth] = useState(false);
   const [isWalletAuth, setIsWalletAuth] = useState(false);
-
 
   const [originalText, setOriginalText] = useState<string>("");
   const [paraphrasedText, setParaphrasedText] = useState<string>("");
@@ -63,18 +67,15 @@ export default function AxenAIRephraser() {
     handleConnectionChange(isConnected);
   }, [isConnected]);
 
-
   let UID = auth.currentUser?.uid;
   let name = auth.currentUser?.displayName;
-  let photo = auth.currentUser?.photoURL || "https://images.unsplash.com/photo-1630568321790-65edcc51b544?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
-  
-
-
-
+  let photo =
+    auth.currentUser?.photoURL ||
+    "https://images.unsplash.com/photo-1630568321790-65edcc51b544?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80";
 
   const signInWithGoogle = () => {
     const provider = new GoogleAuthProvider();
-  
+
     return setPersistence(auth, browserSessionPersistence)
       .then(() => {
         // Existing and future Auth states are now persisted in the current session only.
@@ -85,7 +86,7 @@ export default function AxenAIRephraser() {
       .then((userCredential) => {
         // User signed in successfully
         const user = userCredential.user;
-        
+
         setIsAuth(true);
         return user;
       })
@@ -93,12 +94,10 @@ export default function AxenAIRephraser() {
         // Handle Errors here
         const errorCode = error.code;
         const errorMessage = error.message;
-        console.error('Sign-in error:', errorCode, errorMessage);
+        console.error("Sign-in error:", errorCode, errorMessage);
         throw error;
       });
   };
-
-  
 
   const signOutButton = () => {
     auth
@@ -148,6 +147,26 @@ export default function AxenAIRephraser() {
     setLoading(false);
   };
 
+  async function getAddress() {
+    const url = "https://api.prd.space.id/v1/getAddress?tld=bnb&domain=felix.bnb";
+  
+    try {
+      const response = await axios.get(url);
+      console.log("Address data:", response.data);
+  
+      // Further processing of the data or updating React state can be done here
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle the error or display an error message to the user
+    }
+  }
+
+  useEffect(() => {
+   getAddress();
+  }, [])
+  
+
+
   return (
     <>
       <WagmiConfig client={wagmiClient}>
@@ -165,44 +184,44 @@ export default function AxenAIRephraser() {
                 </span>
               </a>
 
-              <div
-                className=" w-auto md:block md:w-auto"
-                id="navbar-default"
-              >
+              <div className=" w-auto md:block md:w-auto" id="navbar-default">
                 {isConnected && <Web3Button />}
 
                 {UID && !isConnected && (
                   <div className="">
-                  <button
-                  type="button"
-                  className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mx-2"
-                  
-                >
-                 <img src={photo} alt={UID} className="w-5 h-5 mr-2 border rounded-full"/>
-                  {name}
-                </button>
-                  <button
-                    type="button"
-                    className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mx-2"
-                    onClick={signOutButton}
-                  >
-                    <svg
-                      className="w-5 h-5 mr-1"
-                      aria-hidden="true"
-                      focusable="false"
-                      data-prefix="fab"
-                      data-icon="google"
-                      role="img"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 488 512"
+                    <button
+                      type="button"
+                      className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mx-2"
                     >
-                      <path
-                        fill="currentColor"
-                        d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
-                      ></path>
-                    </svg>
-                    Sign Out
-                  </button>
+                      <img
+                        src={photo}
+                        alt={UID}
+                        className="w-5 h-5 mr-2 border rounded-full"
+                      />
+                      {name}
+                    </button>
+                    <button
+                      type="button"
+                      className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mx-2"
+                      onClick={signOutButton}
+                    >
+                      <svg
+                        className="w-5 h-5 mr-1"
+                        aria-hidden="true"
+                        focusable="false"
+                        data-prefix="fab"
+                        data-icon="google"
+                        role="img"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 488 512"
+                      >
+                        <path
+                          fill="currentColor"
+                          d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"
+                        ></path>
+                      </svg>
+                      Sign Out
+                    </button>
                   </div>
                 )}
 
