@@ -22,11 +22,7 @@ import { auth } from "../firebase";
 const chains = [bsc];
 const projectId = "b45cd42eda39ee4449d97896b80bb6bb";
 import "firebase/auth";
-import { providers } from "ethers";
 import axios from "axios";
-const SID = require("@siddomains/sidjs").default;
-const SIDfunctions = require("@siddomains/sidjs");
-const Web3 = require("web3");
 
 const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiClient = createClient({
@@ -41,6 +37,7 @@ export default function AxenAIRephraser() {
   // Define three state variables for the original text, paraphrased text, and paraphrase mode
   const [isAuth, setIsAuth] = useState(false);
   const [isWalletAuth, setIsWalletAuth] = useState(false);
+  const [walletName, setWalletName] = useState("");
 
   const [originalText, setOriginalText] = useState<string>("");
   const [paraphrasedText, setParaphrasedText] = useState<string>("");
@@ -83,14 +80,14 @@ export default function AxenAIRephraser() {
         // New sign-in will be persisted with session persistence.
         return signInWithPopup(auth, provider);
       })
-      .then((userCredential) => {
+      .then((userCredential: { user: any; }) => {
         // User signed in successfully
         const user = userCredential.user;
 
         setIsAuth(true);
         return user;
       })
-      .catch((error) => {
+      .catch((error: { code: any; message: any; }) => {
         // Handle Errors here
         const errorCode = error.code;
         const errorMessage = error.message;
@@ -108,7 +105,7 @@ export default function AxenAIRephraser() {
         setIsAuth(false);
         // Add any additional logic or state updates here
       })
-      .catch((error) => {
+      .catch((error: any) => {
         // An error occurred during sign-out
         console.log(error);
       });
@@ -147,25 +144,22 @@ export default function AxenAIRephraser() {
     setLoading(false);
   };
 
-  async function getAddress() {
-    const url = "https://api.prd.space.id/v1/getAddress?tld=bnb&domain=felix.bnb";
-  
-    try {
-      const response = await axios.get(url);
-      console.log("Address data:", response.data);
-  
-      // Further processing of the data or updating React state can be done here
-    } catch (error) {
-      console.error("Error:", error);
-      // Handle the error or display an error message to the user
-    }
-  }
+  const url = "https://api.prd.space.id/v1/getName";
+  const params = {
+    tld: "bnb",
+    address: "0x2e552E3aD9f7446e9caB378c008315E0C26c0398",
+  };
 
-  useEffect(() => {
-   getAddress();
-  }, [])
-  
-
+  axios
+    .get(url, { params })
+    .then((response) => {
+      // Handle the response data
+      console.log(response.data);
+    })
+    .catch((error) => {
+      // Handle any errors
+      console.error(error);
+    });
 
   return (
     <>
@@ -173,7 +167,7 @@ export default function AxenAIRephraser() {
         <div className="flex flex-col items-center justify-between min-h-screen bg-[url('../public/img/bg.png')] bg-no-repeat bg-cover bg-center w-screen">
           <nav className="bg-white border-gray-200/40 dark:bg-gray-900/40 w-screen">
             <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-              <a href="https://flowbite.com/" className="flex items-center">
+              <a href="https://axenai.com/" className="flex items-center">
                 <img
                   src="https://cdn.discordapp.com/attachments/1035139393150787675/1082016731003887756/Intersect.png"
                   className="h-8 mr-3"
@@ -185,7 +179,11 @@ export default function AxenAIRephraser() {
               </a>
 
               <div className=" w-auto md:block md:w-auto" id="navbar-default">
-                {isConnected && <Web3Button />}
+                {isConnected && (
+                  <div className="">
+                    <Web3Button />
+                  </div>
+                )}
 
                 {UID && !isConnected && (
                   <div className="">
