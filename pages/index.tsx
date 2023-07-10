@@ -23,6 +23,8 @@ const chains = [bsc];
 const projectId = "b45cd42eda39ee4449d97896b80bb6bb";
 import "firebase/auth";
 import axios from "axios";
+import { HttpProvider } from "web3";
+import { ethers } from "ethers";
 
 const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiClient = createClient({
@@ -30,6 +32,9 @@ const wagmiClient = createClient({
   connectors: w3mConnectors({ projectId, version: 1, chains }),
   provider,
 });
+const SID = require("@siddomains/sidjs").default;
+const SIDfunctions = require("@siddomains/sidjs");
+const Web3 = require("web3");
 const ethereumClient = new EthereumClient(wagmiClient, chains);
 
 // Define a default function component called Axen AI Rephraser
@@ -80,14 +85,14 @@ export default function AxenAIRephraser() {
         // New sign-in will be persisted with session persistence.
         return signInWithPopup(auth, provider);
       })
-      .then((userCredential: { user: any; }) => {
+      .then((userCredential: { user: any }) => {
         // User signed in successfully
         const user = userCredential.user;
 
         setIsAuth(true);
         return user;
       })
-      .catch((error: { code: any; message: any; }) => {
+      .catch((error: { code: any; message: any }) => {
         // Handle Errors here
         const errorCode = error.code;
         const errorMessage = error.message;
@@ -144,22 +149,29 @@ export default function AxenAIRephraser() {
     setLoading(false);
   };
 
-  const url = "https://api.prd.space.id/v1/getName";
-  const params = {
-    tld: "bnb",
-    address: "0x2e552E3aD9f7446e9caB378c008315E0C26c0398",
-  };
+  const newAddress: String = address!;
 
-  axios
-    .get(url, { params })
-    .then((response) => {
-      // Handle the response data
-      console.log(response.data);
-    })
-    .catch((error) => {
-      // Handle any errors
-      console.error(error);
+  let sid;
+  async function main(address: any) {
+    const rpc =
+      "https://bsc-mainnet.nodereal.io/v1/d0c3ef1cdb0247f4b6fae228aa76c8b8";
+    const provider = new ethers.providers.JsonRpcProvider(rpc);
+    const chainId = "56";
+    sid = new SID({
+      provider,
+      sidAddress: SIDfunctions.getSidAddress(chainId),
     });
+
+    const name = await sid.getName(address);
+    console.log("name: %s, address: %s", name, address);
+    setWalletName(name.name);
+    console.log(walletName);
+  }
+  useEffect(() => {
+    if (isConnected) {
+      main(newAddress);
+    }
+  }, [isConnected, main, newAddress]);
 
   return (
     <>
@@ -180,7 +192,15 @@ export default function AxenAIRephraser() {
 
               <div className=" w-auto md:block md:w-auto" id="navbar-default">
                 {isConnected && (
-                  <div className="">
+                  <div className="items-center justify-center flex">
+                    {walletName && (
+                      <button
+                        type="button"
+                        className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:ring-[#4285F4]/50 font-medium rounded-full p-2.5 text-sm text-center inline-flex items-center dark:focus:ring-[#4285F4]/55 mx-2"
+                      >
+                        {walletName}
+                      </button>
+                    )}
                     <Web3Button />
                   </div>
                 )}
