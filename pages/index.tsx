@@ -26,15 +26,16 @@ import axios from "axios";
 import { HttpProvider } from "web3";
 import { ethers } from "ethers";
 
+import { providers } from "ethers";
+import SID, { getSidAddress } from "@siddomains/sidjs";
+
 const { provider } = configureChains(chains, [w3mProvider({ projectId })]);
 const wagmiClient = createClient({
   autoConnect: true,
   connectors: w3mConnectors({ projectId, version: 1, chains }),
   provider,
 });
-const SID = require("@siddomains/sidjs").default;
-const SIDfunctions = require("@siddomains/sidjs");
-const Web3 = require("web3");
+
 const ethereumClient = new EthereumClient(wagmiClient, chains);
 
 // Define a default function component called Axen AI Rephraser
@@ -157,10 +158,7 @@ export default function AxenAIRephraser() {
       "https://bsc-mainnet.nodereal.io/v1/d0c3ef1cdb0247f4b6fae228aa76c8b8";
     const provider = new ethers.providers.JsonRpcProvider(rpc);
     const chainId = "56";
-    sid = new SID({
-      provider,
-      sidAddress: SIDfunctions.getSidAddress(chainId),
-    });
+    const sid = new SID({ provider, sidAddress: getSidAddress("56") });
 
     const name = await sid.getName(address);
     console.log("name: %s, address: %s", name, address);
